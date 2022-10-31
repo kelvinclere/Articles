@@ -1,35 +1,32 @@
-require_relative './article'
+require_relative 'article'
 
 class Author
-  # Instance variables
-  attr_reader :name
-  # Class Variables
-  @@all = []
-  # Instance methods
+  attr_reader :name, :articles, :magazines
+
   def initialize(name)
     @name = name
-    @@all << self
   end
 
   def articles
-    Article.all.filter {|article| article.author == self}
+    Article.all.filter do |article|
+      article.author == self
+    end
   end
 
   def magazines
-    self.articles.map {|article| article.magazine}.uniq
+    articles.collect do |article|
+      article.magazine.uniq
+    end
   end
 
   def add_article(magazine, title)
-    Article.new(self, magazine, title)
+    Article.new(magazine, title)
   end
 
   def topic_areas
-      self.magazines.map {|magazine|magazine.category}.uniq
+    magazines.collect do |mags|
+      mags.category.uniq
+    end
   end
-  # Class methods
-  def self.all
-    @@all
-  end
- 
-  
+
 end
