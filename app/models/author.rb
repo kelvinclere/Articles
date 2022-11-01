@@ -1,32 +1,36 @@
-require_relative 'article'
-
 class Author
-  attr_reader :name, :articles, :magazines
+  attr_reader :name
+  @@all = []
 
   def initialize(name)
     @name = name
+    @@all << self
   end
 
+  #Article instances written by this author
   def articles
-    Article.all.filter do |article|
-      article.author == self
+    Article.all.filter.with_index do |article, index| 
+      # article.author.name == self.name
+      Article.all[index].author == self.name
     end
   end
 
   def magazines
-    articles.collect do |article|
-      article.magazine.uniq
-    end
+    all_magazines = self.articles.map { |article| article.magazine }
+    all_magazines.uniq()
+  end
+
+  def self.all
+    @@all
   end
 
   def add_article(magazine, title)
-    Article.new(magazine, title)
+    Article.new(self, magazine, title)
   end
 
   def topic_areas
-    magazines.collect do |mags|
-      mags.category.uniq
-    end
+    all_categories_contributed = self.articles.map {|article| article.category}
+    all_categories_contributed.uniq()
   end
 
 end

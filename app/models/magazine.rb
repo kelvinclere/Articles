@@ -1,9 +1,6 @@
-require_relative 'article'
-
 class Magazine
-    attr_accessor :name, :category
-
-    @@all= []
+  attr_accessor :name, :category
+  @@all = []
 
   def initialize(name, category)
     @name = name
@@ -11,40 +8,36 @@ class Magazine
     @@all << self
   end
 
-def self.all
-  @@all
-end
-
-def contributors
-  Article.all.filter do |magazine|
-    magazine.magazine == self
-  end.collect do |magz|
-    magz.author
+  def self.all
+    @@all
   end
-end
 
-def self.find_by_name(name)
-  self.all.find do |magazine|
-    magazine.name == name
+  def contributors
+    author_instances = Article.all.filter_map.with_index do |article,index| 
+      if(Article.all[index].magazine == self.name)
+          # article.author.name
+          Article.all[index].author
+          Author.all.find { |author_instance|  author_instance.name == Article.all[index].author }
+      end
+    end
+    author_instances.uniq
   end
-end
 
-def article_titles
-  Article.all.filter do |magazine|
-    magazine.magazine == self
-  end.collect do |article|
-    article.title
+  def self.find_by_name(name)
+    Magazine.all.find {|magazine| magazine.name == name}
   end
-end
 
-def contributing_authors
-  Article.all.select do |magazine|
-    magazine.magazine == self
-  end.collect do |author|
-    author.author
-  end.uniq.collect do |article|
-    article.articles.count > 2
+  def article_titles
+    Article.all.filter.filter_map.with_index {|article,index| article.title if Article.all[index].magazine == self.name}
   end
-end
+
+  def contributing_authors
+    all_magazine_authors = Article.all.filter.filter_map.with_index { |article,index| article.author if Article.all[index].magazine == self.name }
+    
+    authors_more_than_two_articles = all_magazine_authors.filter { |author| all_magazine_authors.count(author) > 2 }
+
+    authors_more_than_two_articles.uniq
+  end
+
 
 end
